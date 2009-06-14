@@ -1,1 +1,0 @@
-Just my attempt at a simple roguelike api.
