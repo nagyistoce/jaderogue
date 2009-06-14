@@ -1,1 +1,2 @@
+#sidebar home
 <wiki:gadget url="http://jaderogue.googlecode.com/svn/trunk/doc/wrapper.xml" height="1000" width="800"/>
