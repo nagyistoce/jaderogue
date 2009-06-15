@@ -1,6 +1,4 @@
-#List some features of the jaderogue library.
-
-Jaderogue aims to make roguelike development easy. Heres a look at some of the features already implemented!
+#Jaderogue aims to make roguelike development easy. Take a look at some of the features already implemented!
 
 = Core =
 
