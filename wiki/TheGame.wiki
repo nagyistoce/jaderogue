@@ -1,0 +1,5 @@
+#summary Unnamed roguelike in dev.
+
+= Proof that it works =
+
+[http://code.google.com/p/jaderogue/source/browse/trunk/rl proof]
