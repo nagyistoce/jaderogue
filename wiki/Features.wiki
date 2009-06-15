@@ -1,0 +1,31 @@
+#List some features of the jaderogue library.
+
+Jaderogue aims to make roguelike development easy. Heres a look at some of the features already implemented!
+
+= Core =
+
+With jade console, you don't have to worry about curses any more.
+
+With jade world and actors, you can easily get started on your roguelike.
+
+= FoV =
+
+Varius field of vision algorithms have been implemented including:
+  * Raycasting - simple and fast
+  * Shadowcasting - recursive raycasting
+  * Permissive - precise permissive field of view
+
+= Gen =
+
+Various map generation algorithms have been implemented including:
+  * Cellular - interesting caves via cellular automaton
+  * Traditional - a grid based room and corridor dungeon
+  * Wilderness - a simple fenced wilderness
+  * Town - a wilderness with a few buildings
+  * BSP - uses binary space partition trees to generate dungeons
+
+= Path =
+
+Two algorithms have been implemented for easy path finding:
+  * A* will quickly get you the optimal path you need
+  * Bresenham will find you a straight path (useful for LOS!)
