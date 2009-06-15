@@ -1,4 +1,4 @@
-#summary An introduction to the jaderogue libary
+#summary Jaderogue - a roguelike java library
 
 = Jaderogue Library =
 
