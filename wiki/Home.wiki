@@ -1,4 +1,4 @@
-#An introduction to the jaderogue libary
+#summary An introduction to the jaderogue libary
 
 = Jaderogue Library =
 
