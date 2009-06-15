@@ -1,0 +1,17 @@
+#An introduction to the jaderogue libary
+
+= Jaderogue Library =
+
+Jaderogue is meant to be a simple to understand and use roguelike library for Java. You should be able to quit thinking about game mechanics and just start thinking about your game.
+
+= News =
+
+Jaderogue is constantly being updated. Look under changes in the source tab!
+
+= Contact =
+
+Feedback is appreciated! Send comments, suggestions, request, bugs to jefflund@gmail.com and I'll see what I can do.
+
+= About Me =
+
+I am a CS undergrad at Brigham Young University. My wife and I just welcomed the arrival of our first son. I have been a fan of roguelikes, specifically Angband, since high school.
