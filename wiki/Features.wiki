@@ -1,4 +1,4 @@
-#Jaderogue aims to make roguelike development easy. Take a look at some of the features already implemented!
+#summary Jaderogue aims to make roguelike development easy. Take a look at some of the features already implemented!
 
 = Core =
 
