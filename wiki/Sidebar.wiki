@@ -1,4 +1,4 @@
-#jaderogue wiki contents
+#summary jaderogue wiki contents
 
 === [Home Home] ===
 === [Features Features] ===
