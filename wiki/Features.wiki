@@ -25,5 +25,5 @@ Various map generation algorithms have been implemented including:
 = Path =
 
 Two algorithms have been implemented for easy path finding:
-  * A* will quickly get you the optimal path you need
+  * A'*' will quickly get you the optimal path you need
   * Bresenham will find you a straight path (useful for LOS!)
