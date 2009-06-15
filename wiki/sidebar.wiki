@@ -1,4 +1,0 @@
-===[home home]===
-===[features features]===
-===[tutorial tutorial]===
-===[documentation documentation]===
