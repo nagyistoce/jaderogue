@@ -1,5 +1,10 @@
-Core
-FoV
-Gen
-Path
-Util
+===Core===
+World and Actor
+===FoV===
+Field of Vision
+===Gen===
+Map Generation
+===Path===
+Pathfinding
+===Util===
+Utilities
