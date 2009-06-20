@@ -1,3 +1,26 @@
 #summary Getting started with jaderogue is easy!
 
-= COMING SOON =
+= Console =
+
+With the excellent API of Java, it is a great language for roguelike developement. However, it doesn't handle blocked keyboard input nearly as easy. With jade console, these difficulties disappear. While not identical to curses, you'll find the api fairly simple to use. So lets get started!
+{{{
+	Console console = Console.getFramedConsole("Jade Console");
+}}}
+While we could use the constructors, and place the console on any container we choose, this static method places the Console in a JFrame for us. Easy huh?
+{{{
+	console.buffChar(0, 0, '@', Color.white);
+	console.buffString(0, world.height - 1, "Welcome to the jade console!", Color.white);
+	console.refreshScreen();
+}}}
+This shows us two methods for writting to the console buffer. They each have several variations but they all do the same thing. Note that without the refreshScreen(), we would not yet see these changes as they would only be written to the screen buffer.
+{{{
+	console.saveBuffer();
+	console.clearBuffer();
+	console.refreshScreen();
+	console.getKey();
+	console.recallBuffer();
+	console.refreshScreen();
+}}}
+This shows us two the saveBuffer() method and the getKey() method. SaveBuffer() write the current buffer state to a second buffer. This is useful for doing things like menus, then recalling the previous screen. You'll also notice that getKey() blocked until a key was pressed.
+
+There are a few other useful methods such as echoChar, echoString, and charAt that you can check out in the documentation. One final note, if you serialize a Console, you will need to call onDeserialize() after reloading the Console from file or else anything that blocks for key presses will crash.
