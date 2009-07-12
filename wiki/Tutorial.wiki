@@ -24,3 +24,89 @@ This shows us two methods for writting to the console buffer. They each have sev
 This shows us two the saveBuffer() method and the getKey() method. SaveBuffer() write the current buffer state to a second buffer. This is useful for doing things like menus, then recalling the previous screen. You'll also notice that getKey() blocked until a key was pressed.
 
 There are a few other useful methods such as echoChar, echoString, and charAt that you can check out in the documentation. One final note, if you serialize a Console, you will need to call onDeserialize() after reloading the Console from file or else anything that blocks for key presses will crash.
+
+= World =
+
+So we can use console to get the famous walking @ demo, but we now need a dungeon. Jade World comes to the rescue. With Jade World, creating new dungeons is easy.
+{{{
+	World world = new World(80, 24)
+	{
+		public void tick()
+		{}
+	}
+}}}
+Notice that World is an abstract class and the tick method must be overwritten. In this case, we override it to do nothing, but the tick method is most useful to represent what happens each game turn. Monster might move, spells might fire, and the player gets to take action. However, we need a dungeon still!
+{{{
+	GenFactory.get(GenFactory.Cellular).generate(world, random.nextLong());
+}}}
+There are various dungeon generation algorithms already implemented for you. You access them using the GenFactory, or you can make your own. Then, you just call the generate method on the world, and you have a dungeon. You must also pass in a seed which will determine what the world looks like after generation. (Now you can store a level with a single long!)
+{{{
+	for(int x = 0; x < world.width; x++)
+		for(int y = 0; y < world.height; y++)
+			console.buffChar(x, y, world.look(x, y));
+}}}
+This code shows us how to look at a single tile. By default, the look method just returns the character representation of the tile at (x,y), but it is advisable to override the method to also consider the tile's occupants, but that would require an Actor.
+
+== Actor ==
+
+Jade Actors represent anything that could be placed on a Jade World from monster, items, spells, and the player. Let see how to add them.
+{{{
+	Actor actor = new Actor('@', Color.white)
+	{
+		public void act()
+		{}
+	};
+	world.addActor(actor, 5, 5);
+}}}
+That was pretty easy! We notice again that we implemented an abstract method of Actor. The act method determines what this actor will do during a tick. The world ought to call act when appropriate. Lets extends Actor to learn more.
+{{{
+public class DrunkenIdiot extends Actor
+{
+	private Dice dice;
+	
+	public DrunkenIdiot()
+	{
+		super('t', Color.yellow);
+		random = new Random();
+	}
+	
+	public void act()
+	{
+		int dx = dice.nextInt(-1, 1);
+		int dy = dice.nextInt(-1, 1);
+		if(world().passable(x() + dx, y() + dy)
+			move(dx, dy);
+	}
+}
+}}}
+We can now place as many drunken idiots on the map as we want! We can see that the move method simple translates the position of the Actor by the specified x,y amounts. We also see the use of the Dice class from the util package. It just extends the functionality of Random, but one day might be rewritten as a Mersenne Twister. Now lets make another Actor.
+{{{
+public class Plague extends Actor
+{
+	private int timeUntilDeath;
+	
+	public Plague()
+	{
+		super('\0', Color.black);
+		timeUntilDeath = 10; 
+	}
+	
+	public void act()
+	{
+		if(held())
+			timeUntilDeath--;
+		else
+		{
+			DrunkenIdiot idiot = world().getActorAt(x(), y(), DrunkenIdiot.class);
+			if(idiot != null)
+				attachTo(idiot);	
+		}
+		if(timeUntilDeath == 0)
+		{
+			holder().expire();
+			appendMessage(holder() + " succumbs to the plague");
+		}
+	}
+}
+}}}
+How evil! This class shows another power of the actor. 
