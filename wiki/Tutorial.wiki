@@ -109,4 +109,4 @@ public class Plague extends Actor
 	}
 }
 }}}
-How evil! This class shows another power of the actor. 
+How evil! This class shows another power of the actor. Actors can attach to one another. This can be useful when a character picks up an item, or for cool spell effects. If you want a timed spell, just attach it to an actor with a timer, and when the time is right, no matter where the target actor has gone, the spell will be able to fire. You could even have spells that affect other spells if you wanted.
