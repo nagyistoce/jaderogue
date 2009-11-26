@@ -82,6 +82,12 @@ public abstract class Actor extends Messenger implements Serializable
 		setPos(x() + dx, y() + dy);
 	}
 
+	public Coord pos() 
+	{
+		assert (bound());
+		return pos;
+	}
+	
 	/**
 	 * Returns the x-coordinate of the actor. The actor must belong to a world. If
 	 * it is attached to another actor, this will be the x-coordinate of the

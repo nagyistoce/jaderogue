@@ -73,11 +73,11 @@ public class AStar implements Path
 	{
 		final Set<Node> adjacent = new TreeSet<Node>();
 		adjacent.add(getNode(new Coord(node.coord.x() + 1, node.coord.y())));
-		adjacent.add(getNode(new Coord(node.coord.x() + 1, node.coord.y() - 1)));
-		adjacent.add(getNode(new Coord(node.coord.x() + 1, node.coord.y() + 1)));
+		//adjacent.add(getNode(new Coord(node.coord.x() + 1, node.coord.y() - 1)));
+		//adjacent.add(getNode(new Coord(node.coord.x() + 1, node.coord.y() + 1)));
 		adjacent.add(getNode(new Coord(node.coord.x() - 1, node.coord.y())));
-		adjacent.add(getNode(new Coord(node.coord.x() - 1, node.coord.y() - 1)));
-		adjacent.add(getNode(new Coord(node.coord.x() - 1, node.coord.y() + 1)));
+		//adjacent.add(getNode(new Coord(node.coord.x() - 1, node.coord.y() - 1)));
+		//adjacent.add(getNode(new Coord(node.coord.x() - 1, node.coord.y() + 1)));
 		adjacent.add(getNode(new Coord(node.coord.x(), node.coord.y() - 1)));
 		adjacent.add(getNode(new Coord(node.coord.x(), node.coord.y() + 1)));
 		final Set<Node> nonpassable = new TreeSet<Node>();

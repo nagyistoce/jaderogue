@@ -47,7 +47,6 @@ public class ColoredChar implements Serializable, Comparable<ColoredChar>
 		return Character.toString(ch);
 	}
 
-	@Override
 	public int compareTo(ColoredChar other)
 	{
 		if(color.hashCode() == other.color.hashCode())

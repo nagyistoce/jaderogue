@@ -7,9 +7,9 @@ import java.util.TreeSet;
  * Tools contains lots of methods that are generally useful, but do not fit in
  * any one jade class.
  */
-public final class Tools
+public class Tools
 {
-	private Tools()
+	protected Tools()
 	{
 		throw new IllegalAccessError("Tools cannot be instantiated");
 	}
