@@ -1,6 +1,13 @@
 package jade.util;
 
-import static java.awt.event.KeyEvent.*;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_KP_DOWN;
+import static java.awt.event.KeyEvent.VK_KP_LEFT;
+import static java.awt.event.KeyEvent.VK_KP_RIGHT;
+import static java.awt.event.KeyEvent.VK_KP_UP;
+import static java.awt.event.KeyEvent.VK_LEFT;
+import static java.awt.event.KeyEvent.VK_RIGHT;
+import static java.awt.event.KeyEvent.VK_UP;
 
 public class ExtraTools extends Tools {
 	public static Direction keycodeToStep(int keycode) {
@@ -32,6 +39,13 @@ public class ExtraTools extends Tools {
 		return next;
 	}
 
+	static int normalize(int i) {
+		if (i == 0)
+			return 0;
+		else
+			return i < 0 ? -1 : 1;
+	}
+
 	static Enum prev(Enum[] values, int ordinal, int length) {
 		Enum next = null;
 
@@ -40,12 +54,5 @@ public class ExtraTools extends Tools {
 				next = mo;
 
 		return next;
-	}
-	
-	static int normalize(int i) {
-		if(i==0)
-			return 0;
-		else
-			return i<0?-1:1;
 	}
 }

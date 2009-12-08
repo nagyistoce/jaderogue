@@ -4,6 +4,7 @@ import jade.core.World;
 import jade.util.Coord;
 import jade.util.Dice;
 import jade.util.Rect;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,41 +16,8 @@ import java.util.Set;
  * This implementation of Gen uses a binary space partition tree to generate a
  * traditional looking dungeon with a set of interconnected rectangular rooms.
  */
-public class Traditional implements Gen
-{
-	private final Dice dice;
-	private static final int MIN_SIZE = 3;
-
-	protected Traditional()
-	{
-		dice = new Dice();
-	}
-
-	public void generate(World world, long seed)
-	{
-		generate(world, seed, new Rect(world.width, world.height));
-	}
-	
-	public void generate(World world, long seed, Rect rect)
-	{
-		dice.setSeed(seed);
-		floodWithWall(world, rect);
-		final BSP head = new BSP(rect);
-		head.divide();
-		head.makeRooms(world);
-		head.connect(world);
-		head.addCycles(world);
-	}
-
-	private void floodWithWall(World world, Rect rect)
-	{
-		for(int x = rect.xMin(); x < rect.xMax(); x++)
-			for(int y = rect.yMin(); y < rect.yMax(); y++)
-				world.tile(x, y).setTile('#', Color.white, false);
-	}
-
-	private class BSP
-	{
+public class Traditional implements Gen {
+	private class BSP {
 		private final int x1;
 		private final int y1;
 		private final int x2;
@@ -64,18 +32,7 @@ public class Traditional implements Gen
 		private boolean connected;
 		private boolean readyConnect;
 
-		public BSP(Rect rect)
-		{
-			connected = true;
-			readyConnect = true;
-			x1 = rect.xMin();
-			y1 = rect.yMin();
-			x2 = rect.xMax() - 1;
-			y2 = rect.yMax() - 1;
-		}
-
-		private BSP(BSP parent, int div, boolean vert, boolean left)
-		{
+		private BSP(BSP parent, int div, boolean vert, boolean left) {
 			this.parent = parent;
 			connected = false;
 			readyConnect = true;
@@ -85,35 +42,28 @@ public class Traditional implements Gen
 			y2 = !vert && left ? parent.y1 + div : parent.y2;
 		}
 
-		public void makeRooms(World world)
-		{
-			if(leaf())
-			{
-				rx1 = dice.nextInt(x1 + 1, x2 - 1 - MIN_SIZE);
-				rx2 = dice.nextInt(rx1 + MIN_SIZE, x2 - 1);
-				ry1 = dice.nextInt(y1 + 1, y2 - 1 - MIN_SIZE);
-				ry2 = dice.nextInt(ry1 + MIN_SIZE, y2 - 1);
-				for(int x = rx1; x <= rx2; x++)
-					for(int y = ry1; y <= ry2; y++)
-						world.tile(x, y).setTile('.', Color.white, true);
-			}
-			else
-			{
-				left.makeRooms(world);
-				right.makeRooms(world);
+		public BSP(Rect rect) {
+			connected = true;
+			readyConnect = true;
+			x1 = rect.xMin();
+			y1 = rect.yMin();
+			x2 = rect.xMax() - 1;
+			y2 = rect.yMax() - 1;
+		}
+
+		public void addCycles(World world) {
+			List<BSP> leaves = new ArrayList<BSP>(getLeaves());
+			if (leaves.size() < 5)
+				return;
+			for (int i = 0; i < dice.nextInt(leaves.size() / 2, leaves.size()); i++) {
+				BSP leaf1 = leaves.remove(leaves.size() - 1);
+				BSP leaf2 = leaves.get(dice.nextInt(leaves.size()));
+				leaf1.connectTo(world, leaf2);
 			}
 		}
 
-		public void divide()
-		{
-			while(divideAux())
-				;
-		}
-
-		public void connect(World world)
-		{
-			if(!leaf())
-			{
+		public void connect(World world) {
+			if (!leaf()) {
 				left.connect(world);
 				right.connect(world);
 			}
@@ -121,32 +71,76 @@ public class Traditional implements Gen
 			connectToSibling(world);
 		}
 
-		public void addCycles(World world)
-		{
-			List<BSP> leaves = new ArrayList<BSP>(getLeaves());
-			if(leaves.size() < 5)
-				return;
-			for(int i = 0; i < dice.nextInt(leaves.size() / 2, leaves.size()); i++)
-			{
-				BSP leaf1 = leaves.remove(leaves.size() - 1);
-				BSP leaf2 = leaves.get(dice.nextInt(leaves.size()));
-				leaf1.connectTo(world, leaf2);
+		public void connectTo(World world, BSP leaf) {
+			final Coord start = world.getOpenTile(dice, x1, y1, x2, y2);
+			final Coord end = world.getOpenTile(dice, leaf.x1, leaf.y1,
+					leaf.x2, leaf.y2);
+			final List<Coord> corridor = new LinkedList<Coord>();
+			final Coord curr = new Coord(start);
+			while (!curr.equals(end)) {
+				corridor.add(new Coord(curr));
+				final boolean digging = !world.isPassable(curr);
+				if (curr.getX() == end.getX())
+					curr.translate(0, curr.getY() < end.getY() ? 1 : -1);
+				else
+					curr.translate(curr.getX() < end.getX() ? 1 : -1, 0);
+				if (digging && world.isPassable(curr)) {
+					if (leaf.inside(curr))
+						break;
+					corridor.clear();
+				}
 			}
+			for (final Coord coord : corridor)
+				world.getTile(coord).setTile('.', Color.white, true);
 		}
 
-		private boolean divideAux()
-		{
-			if(!leaf())
-			{
+		private void connectToSibling(World world) {
+			if (connected)
+				return;
+			final BSP sibling = this == parent.left ? parent.right
+					: parent.left;
+			if (!sibling.readyConnect)
+				return;
+			final Coord start = world.getOpenTile(dice, x1, y1, x2, y2);
+			final Coord end = world.getOpenTile(dice, sibling.x1, sibling.y1,
+					sibling.x2, sibling.y2);
+			final List<Coord> corridor = new LinkedList<Coord>();
+			final Coord curr = new Coord(start);
+			while (!curr.equals(end)) {
+				corridor.add(new Coord(curr));
+				final boolean digging = !world.isPassable(curr);
+				if (curr.getX() == end.getX())
+					curr.translate(0, curr.getY() < end.getY() ? 1 : -1);
+				else
+					curr.translate(curr.getX() < end.getX() ? 1 : -1, 0);
+				if (digging && world.isPassable(curr)) {
+					if (sibling.inside(curr))
+						break;
+					corridor.clear();
+				}
+			}
+			for (final Coord coord : corridor)
+				world.getTile(coord).setTile('.', Color.white, true);
+			connected = true;
+			sibling.connected = true;
+		}
+
+		public void divide() {
+			while (divideAux())
+				;
+		}
+
+		private boolean divideAux() {
+			if (!leaf()) {
 				final boolean divleft = left.divideAux();
 				final boolean divRight = right.divideAux();
 				return divleft || divRight;
 			}
 			boolean vert = dice.nextBoolean();
 			final int min = MIN_SIZE + 4;
-			if(divTooSmall(vert, min))
+			if (divTooSmall(vert, min))
 				vert = !vert;
-			if(divTooSmall(vert, min))
+			if (divTooSmall(vert, min))
 				return false;
 			final int div = dice.nextInt(min, (vert ? x2 - x1 : y2 - y1) - min);
 			left = new BSP(this, div, vert, true);
@@ -155,100 +149,78 @@ public class Traditional implements Gen
 			return true;
 		}
 
-		private boolean divTooSmall(boolean vert, int min)
-		{
+		private boolean divTooSmall(boolean vert, int min) {
 			min *= 2;
-			return vert ? (x2 - x1) < min : (y2 - y1) < min;
+			return vert ? x2 - x1 < min : y2 - y1 < min;
 		}
 
-		public Set<BSP> getLeaves()
-		{
+		public Set<BSP> getLeaves() {
 			Set<BSP> leaves = new HashSet<BSP>();
 			getLeavesAux(leaves);
 			return leaves;
 		}
 
-		private void getLeavesAux(Set<BSP> leaves)
-		{
-			if(leaf())
+		private void getLeavesAux(Set<BSP> leaves) {
+			if (leaf())
 				leaves.add(this);
-			else
-			{
-				if(left != null)
+			else {
+				if (left != null)
 					left.getLeavesAux(leaves);
-				if(right != null)
+				if (right != null)
 					right.getLeavesAux(leaves);
 			}
 		}
 
-		private boolean leaf()
-		{
+		private boolean inside(Coord coord) {
+			return coord.getX() < x2 && coord.getX() > x1 && coord.getY() < y2
+					&& coord.getY() > y1;
+		}
+
+		private boolean leaf() {
 			return left == null && right == null;
 		}
 
-		private void connectToSibling(World world)
-		{
-			if(connected)
-				return;
-			final BSP sibling = this == parent.left ? parent.right : parent.left;
-			if(!sibling.readyConnect)
-				return;
-			final Coord start = world.getOpenTile(dice, x1, y1, x2, y2);
-			final Coord end = world.getOpenTile(dice, sibling.x1, sibling.y1,
-					sibling.x2, sibling.y2);
-			final List<Coord> corridor = new LinkedList<Coord>();
-			final Coord curr = new Coord(start);
-			while(!curr.equals(end))
-			{
-				corridor.add(new Coord(curr));
-				final boolean digging = !world.passable(curr);
-				if(curr.x() == end.x())
-					curr.translate(0, curr.y() < end.y() ? 1 : -1);
-				else
-					curr.translate(curr.x() < end.x() ? 1 : -1, 0);
-				if(digging && world.passable(curr))
-				{
-					if(sibling.inside(curr))
-						break;
-					corridor.clear();
-				}
+		public void makeRooms(World world) {
+			if (leaf()) {
+				rx1 = dice.nextInt(x1 + 1, x2 - 1 - MIN_SIZE);
+				rx2 = dice.nextInt(rx1 + MIN_SIZE, x2 - 1);
+				ry1 = dice.nextInt(y1 + 1, y2 - 1 - MIN_SIZE);
+				ry2 = dice.nextInt(ry1 + MIN_SIZE, y2 - 1);
+				for (int x = rx1; x <= rx2; x++)
+					for (int y = ry1; y <= ry2; y++)
+						world.getTile(x, y).setTile('.', Color.white, true);
+			} else {
+				left.makeRooms(world);
+				right.makeRooms(world);
 			}
-			for(final Coord coord : corridor)
-				world.tile(coord).setTile('.', Color.white, true);
-			connected = true;
-			sibling.connected = true;
 		}
+	}
 
-		public void connectTo(World world, BSP leaf)
-		{
-			final Coord start = world.getOpenTile(dice, x1, y1, x2, y2);
-			final Coord end = world.getOpenTile(dice, leaf.x1, leaf.y1, leaf.x2,
-					leaf.y2);
-			final List<Coord> corridor = new LinkedList<Coord>();
-			final Coord curr = new Coord(start);
-			while(!curr.equals(end))
-			{
-				corridor.add(new Coord(curr));
-				final boolean digging = !world.passable(curr);
-				if(curr.x() == end.x())
-					curr.translate(0, curr.y() < end.y() ? 1 : -1);
-				else
-					curr.translate(curr.x() < end.x() ? 1 : -1, 0);
-				if(digging && world.passable(curr))
-				{
-					if(leaf.inside(curr))
-						break;
-					corridor.clear();
-				}
-			}
-			for(final Coord coord : corridor)
-				world.tile(coord).setTile('.', Color.white, true);
-		}
+	private final Dice dice;
 
-		private boolean inside(Coord coord)
-		{
-			return coord.x() < x2 && coord.x() > x1 && coord.y() < y2
-					&& coord.y() > y1;
-		}
+	private static final int MIN_SIZE = 3;
+
+	protected Traditional() {
+		dice = new Dice();
+	}
+
+	private void floodWithWall(World world, Rect rect) {
+		for (int x = rect.xMin(); x < rect.xMax(); x++)
+			for (int y = rect.yMin(); y < rect.yMax(); y++)
+				world.getTile(x, y).setTile('#', Color.white, false);
+	}
+
+	public void generate(World world, long seed) {
+		generate(world, seed, new Rect(world.width, world.height));
+	}
+
+	public void generate(World world, long seed, Rect rect) {
+		dice.setSeed(seed);
+		floodWithWall(world, rect);
+		final BSP head = new BSP(rect);
+		head.divide();
+		head.makeRooms(world);
+		head.connect(world);
+		head.addCycles(world);
 	}
 }
