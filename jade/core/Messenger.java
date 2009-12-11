@@ -3,6 +3,9 @@ package jade.core;
 import jade.util.Tools;
 
 import java.io.Serializable;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
 
 /**
  * This class respresents an object that can remember String messages, and
@@ -11,10 +14,16 @@ import java.io.Serializable;
  * messages of its actors and store them in one place for easy access.
  */
 public class Messenger implements Serializable {
-	private String messages;
+
+	private Vector<String> messages;
+	private String message = "";
+	private Logger logger = Logger.getLogger(Messenger.class);
 
 	public Messenger() {
-		clearMessages();
+
+		messages = new Vector<String>();
+		messages.setSize(2);
+		logger.debug("messenger size: " + messages.size());
 	}
 
 	/**
@@ -25,12 +34,10 @@ public class Messenger implements Serializable {
 	 *            the message to be stored
 	 */
 	public void appendMessage(String message) {
-		if (!message.equals(""))
-			messages += Tools.strEnsureSuffix(message, ". ");
-	}
+		messages.add(0, Tools.strEnsureSuffix(message, ". "));
+		messages.remove(2);
 
-	public void clearMessages() {
-		messages = "";
+		logger.debug("append message: " + message);
 	}
 
 	/**
@@ -39,9 +46,13 @@ public class Messenger implements Serializable {
 	 * @return The messengers messegages.
 	 */
 	public String getMessages() {
-		final String result = messages;
-		clearMessages();
-		return result;
+		message = "";
+		if (messages.size() > 0)
+			for (String m : messages)
+				if (m != null && !m.equals(""))
+					message += m;
+
+		return message;
 	}
 
 	/**
@@ -52,6 +63,6 @@ public class Messenger implements Serializable {
 	 *            the messenger whos messages are to be retrieved
 	 */
 	public void retrieveMessages(Messenger messenger) {
-		messages += messenger.getMessages();
+		message += messenger.getMessages();
 	}
 }
