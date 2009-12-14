@@ -5,7 +5,7 @@ import jade.util.Tools;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 /**
  * This class respresents an object that can remember String messages, and
@@ -17,13 +17,11 @@ public class Messenger implements Serializable {
 
 	private Vector<String> messages;
 	private String message = "";
-	private Logger logger = Logger.getLogger(Messenger.class);
+	private Logger logger = Logger.getLogger(Messenger.class.getName());
 
 	public Messenger() {
-
 		messages = new Vector<String>();
 		messages.setSize(2);
-		logger.debug("messenger size: " + messages.size());
 	}
 
 	/**
@@ -34,10 +32,13 @@ public class Messenger implements Serializable {
 	 *            the message to be stored
 	 */
 	public void appendMessage(String message) {
-		messages.add(0, Tools.strEnsureSuffix(message, ". "));
-		messages.remove(2);
+		messages.add(Tools.strEnsureSuffix(message, ". "));
+		if(message.length()>2)
+			messages.remove(0);
 
-		logger.debug("append message: " + message);
+		logger.info("append message: " + message);
+		if(message.equals("guard kills you"))
+			logger.info("");
 	}
 
 	/**
@@ -47,10 +48,11 @@ public class Messenger implements Serializable {
 	 */
 	public String getMessages() {
 		message = "";
-		if (messages.size() > 0)
+		if (messages.size() > 0) {
 			for (String m : messages)
 				if (m != null && !m.equals(""))
 					message += m;
+		}
 
 		return message;
 	}
