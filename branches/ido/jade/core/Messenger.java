@@ -8,7 +8,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
- * This class respresents an object that can remember String messages, and
+ * This class represents an object that can remember String messages, and
  * retrieve messages from other messengers. Both jade World and Actor extend
  * this class with the motivation that the world could then retrieve all the
  * messages of its actors and store them in one place for easy access.
