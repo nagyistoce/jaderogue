@@ -62,7 +62,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * 
 	 * @param actor
 	 */
-	public void attachTo(Actor actor) {
+	protected void attachTo(Actor actor) {
 		assert !isHeld();
 		if (isBound())
 			getWorld().removeActor(this);
@@ -80,7 +80,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * will be placed on the holder's world at the holder's position (assuming
 	 * the holder belongs to a world).
 	 */
-	public void detachFrom() {
+	protected void detachFrom() {
 		assert isHeld();
 		holder.holds.remove(this);
 		final Coord holderPos = new Coord(holder.pos);
@@ -93,7 +93,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * Expires this actor. This will also expire all actors attached to this
 	 * actor.
 	 */
-	public void expire() {
+	protected void expire() {
 		expired = true;
 		for (final Actor held : holds)
 			held.expire();
@@ -120,7 +120,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * @return the world the actor currently belongs too, or null if it does not
 	 *         belong to a world.
 	 */
-	public World getWorld() {
+	protected World getWorld() {
 		return world;
 	}
 
@@ -153,7 +153,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * 
 	 * @return the actor if the actor is held, or null if it is not.
 	 */
-	public Actor holder() {
+	protected Actor getHolder() {
 		return holder;
 	}
 
@@ -164,7 +164,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * 
 	 * @return a collection of the actors this actor holds.
 	 */
-	public Collection<Actor> holds() {
+	protected Collection<Actor> getHolds() {
 		return new HashSet<Actor>(holds);
 	}
 
@@ -173,7 +173,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * 
 	 * @return true if the actor belongs to a world.
 	 */
-	public boolean isBound() {
+	protected boolean isBound() {
 		return world != null;
 	}
 
@@ -184,7 +184,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 *            the world to be checked
 	 * @return true if the actor belongs to the world, false otherwise
 	 */
-	public boolean isBoundTo(World world) {
+	protected boolean isBoundTo(World world) {
 		assert world != null;
 		return this.world == world;
 	}
@@ -203,7 +203,7 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * 
 	 * @return true if the actor is held.
 	 */
-	public boolean isHeld() {
+	protected boolean isHeld() {
 		return holder != null;
 	}
 
@@ -216,14 +216,14 @@ public abstract class Actor extends Messenger implements Serializable {
 	 * @param dy
 	 *            the amount to move vertically
 	 */
-	public void move(int dx, int dy) {
+	protected void move(int dx, int dy) {
 		setPos(getX() + dx, getY() + dy);
 	}
 
 	/**
 	 * Sets the face of this actor
 	 */
-	public void setFace(ColoredChar face) {
+	protected void setFace(ColoredChar face) {
 		this.face = face;
 	}
 
@@ -244,7 +244,7 @@ public abstract class Actor extends Messenger implements Serializable {
 		world.addToGrid(this);
 	}
 
-	void setWorld(World world) {
+	protected void setWorld(World world) {
 		assert !isHeld() || holder.world == world;
 		this.world = world;
 		for (final Actor held : holds)
