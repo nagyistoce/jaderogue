@@ -149,7 +149,7 @@ public abstract class World extends Messenger implements Serializable {
 		actor.setPos(x, y);
 	}
 
-	void addToGrid(Actor actor) {
+	protected void addToGrid(Actor actor) {
 		assert actor.isBoundTo(this);
 		grid[actor.getX()][actor.getY()].getActors().add(actor);
 	}
@@ -394,9 +394,9 @@ public abstract class World extends Messenger implements Serializable {
 		return grid[x][y].isPassable();
 	}
 
-	void registerActor(Actor actor) {
+	protected void registerActor(Actor actor) {
 		actorRegister.add(actor);
-		for (final Actor held : actor.holds())
+		for (final Actor held : actor.getHolds())
 			registerActor(held);
 	}
 
@@ -465,9 +465,9 @@ public abstract class World extends Messenger implements Serializable {
 		return grid[x][y];
 	}
 
-	void unregisterActor(Actor actor) {
+	protected void unregisterActor(Actor actor) {
 		actorRegister.remove(actor);
-		for (final Actor held : actor.holds())
+		for (final Actor held : actor.getHolds())
 			unregisterActor(held);
 	}
 }
