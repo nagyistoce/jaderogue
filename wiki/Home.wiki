@@ -10,8 +10,8 @@ Jaderogue is constantly being updated. Look under changes in the source tab!
 
 = Contact =
 
-Comments, suggestions, request, bug reports are all greatly appreciated. You can just leave a comment on the wiki, or use jefflund @gmail.com for direct contact.
+Comments, suggestions, request, bug reports are all greatly appreciated. You can just leave a comment on the wiki, or use jefflund at gmail.com for direct contact.
 
 = About Me =
 
-I am a CS undergrad at Brigham Young University. My wife and I just welcomed the arrival of our first son. I have been a fan of roguelikes, specifically Angband, since high school.
+I am a CS undergrad at Brigham Young University. I have been a fan of roguelikes, specifically Angband, since high school.

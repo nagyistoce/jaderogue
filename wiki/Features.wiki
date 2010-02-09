@@ -16,13 +16,18 @@ Varius field of vision algorithms have been implemented including:
 
 Various map generation algorithms have been implemented including:
   * Cellular - interesting caves via cellular automaton
-  * Traditional - a grid based room and corridor dungeon
+  * Traditional - uses a BSP to generate rooms and corridors
   * Wilderness - a simple fenced wilderness
   * Town - a wilderness with a few buildings
-  * BSP - uses binary space partition trees to generate dungeons
 
 = Path =
 
 Two algorithms have been implemented for easy path finding:
   * A`*` will quickly get you the optimal path you need
   * Bresenham will find you a straight path (useful for LOS!)
+  
+ = More =
+ 
+ There is much more
+ * Targeting systems
+ * Utility toolbox

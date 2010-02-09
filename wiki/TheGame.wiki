@@ -3,3 +3,15 @@
 = Proof that it works =
 
 [http://code.google.com/p/jaderogue/source/browse/trunk/rl proof]
+
+Planned features (ie. not anytime soon)
+
+Magic system with no preset spells. You get to design all of them. Special channeling spells allow you to draw great amounts of mp in order to cast spells of enormous power. However, casting such spells may leave you vulnerable afterwords.
+
+Persistent but mutable dungeons
+
+Interesting overword. Cities that goto war with one another. You can join factions and participate. If a city gets destroyed, then it is gone forever.
+
+Allies. You can recruit fellow @ to join you in battle. Useful for the interfaction battles.
+
+ 
