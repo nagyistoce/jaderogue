@@ -42,7 +42,7 @@ This is your standard game loop. You display the world, and then proceed a tick.
 		console.refreshScreen();
 	}
 }}}
-This is a pretty standard drawing method. There are more advanced ways of doing this such as Jade Cameras and Jade FoV, but that will be covered later. Note that for this to be interesting, you might want to override the look(..) method, but more on that in a bit.
+This is a pretty standard drawing method. There are more advanced ways of doing this such as Jade Cameras and Jade FoV, but that will be covered later. Note that for this to be interesting, you might want to override the lookAll(..) method, but more on that in a bit.
 {{{
 	public void tick()
 	{
@@ -65,18 +65,19 @@ Here is the tick() method from our DemoWorld class. It calls the act() method on
 }}}
 Here we have the act() method from the DemoActor class. It waits for user input then moves based on that input. You could use a big switch statement around the key and move by two ints dx and dy, or move by a Coord, but this seemed the easiest way to move a single tile. Of course, your game might include more complex logic like checking for obstacles (this guy can go through walls!), monsters using world().getActorAt(..) or casting spells or what ever. This is just a basic act() method. The monsters would put their ai code here as well. 
 {{{
-	public ColoredChar look(int x, int y)
+	public List<ColoredChar> lookAll(int x, int y)
 	{
-		Actor actor = getActorAt(x, y, DemoActor.class);
+		List<ColoredChar> look = super.lookAll(x, y);
+		DemoTrap trap = getActorAt(x, y, DemoTrap.class);
+		if(trap != null)
+			look.add(trap.look());
+		DemoActor actor = getActorAt(x, y, DemoActor.class);
 		if(actor != null)
-			return actor.look();
-		actor = getActorAt(x, y, DemoTrap.class);
-		if(actor != null)
-			return actor.look();
-		return super.look(x, y);
+			look.add(actor.look());
+		return look;
 	}
 }}}
-As mentioned before the World should generally override the method look(..) or it will simple display the tile of that location. This method shows how to draw the occupants of the tile.
+As mentioned before the World should generally override the method lookAll(..) or it will simple display the tile of that location. Once this method is overridden and a draw order established, you can call look and it will correctly display the top face. To use lookAll correctly, call super.lookAll, then append any other faces that should show up starting with the lowest priority in the draw order.
 {{{
 	public void act()
 	{
