@@ -29,10 +29,10 @@ public class ExtraTools extends Tools {
 		}
 	}
 
-	static Enum next(Enum[] values, int ordinal, int length) {
-		Enum next = null;
+	static Enum<?> next(Enum<?>[] values, int ordinal, int length) {
+		Enum<?> next = null;
 
-		for (Enum mo : values)
+		for (Enum<?> mo : values)
 			if ((ordinal + 1) % length == mo.ordinal())
 				next = mo;
 
@@ -46,10 +46,10 @@ public class ExtraTools extends Tools {
 			return i < 0 ? -1 : 1;
 	}
 
-	static Enum prev(Enum[] values, int ordinal, int length) {
-		Enum next = null;
+	static Enum<?> prev(Enum<?>[] values, int ordinal, int length) {
+		Enum<?> next = null;
 
-		for (Enum mo : values)
+		for (Enum<?> mo : values)
 			if ((ordinal + length - 1) % length == mo.ordinal())
 				next = mo;
 
