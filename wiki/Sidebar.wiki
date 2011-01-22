@@ -1,7 +1,0 @@
-#summary jaderogue wiki contents
-
-=== [Home Home] ===
-=== [Features Features] ===
-=== [Tutorial Tutorial] ===
-=== [Documentation Documentation] ===
-=== [TheGame The Game] ===
