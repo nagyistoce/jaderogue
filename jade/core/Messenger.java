@@ -1,112 +1,59 @@
 package jade.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import jade.util.Tools;
+import java.io.Serializable;
 
 /**
- * Allows for easy passing and aggregation of messages. A message is consists of
- * a Messenger source and a String content.
+ * Base class for both Actor and World. Allows all the messages to be propagated
+ * to one central spot and given to the user.
  */
-public class Messenger
+public class Messenger implements Serializable
 {
-    private List<Message> messages;
+	private String messages;
 
-    /**
-     * Constructs a new Messenger with an empty message cache.
-     */
-    public Messenger()
-    {
-        messages = new ArrayList<Message>();
-    }
+	/**
+	 * Creates a new Messenger
+	 */
+	public Messenger()
+	{
+		clearMessages();
+	}
 
-    /**
-     * Appends a message to the Messenger cache, with this Messenger as the
-     * source of the message.
-     * @param message the contents of the message
-     */
-    public void appendMessage(String message)
-    {
-        messages.add(new Message(this, message));
-    }
+	/**
+	 * Clears any messages the Messenger has.
+	 */
+	public final void clearMessages()
+	{
+		messages = "";
+	}
 
-    /**
-     * Appends a message to the Messenger cache, with this Messenger as the
-     * source of the message. If the message does not have the specified suffix,
-     * it will be concatinated to the message.
-     * @param message the contents of the message
-     * @param suffix the required message suffix
-     */
-    public void appendMessage(String message, String suffix)
-    {
-        if(message.endsWith(suffix))
-            appendMessage(message);
-        else
-            appendMessage(message + suffix);
-    }
+	/**
+	 * Appends a new message to the previous messages. The message is ensured to
+	 * end with ". "
+	 */
+	public final void appendMessage(String message)
+	{
+		if(!message.equals(""))
+			messages += Tools.strEnsureSuffix(message, ". ");
+	}
 
-    /**
-     * Clears the messages in the Messenger cache.
-     */
-    public void clearMessages()
-    {
-        messages.clear();
-    }
+	/**
+	 * Removes the messages from the given Messenger and appends them to this
+	 * Messenger's messages.
+	 */
+	public final void retrieveMessages(Messenger messenger)
+	{
+		messages += messenger.getMessages();
+	}
 
-    /**
-     * Returns the concatination of all messages in the messenger cache, then
-     * clears the cache.
-     * @return the concatination of all messages in the messenger cache
-     */
-    public String getMessages()
-    {
-        String result = "";
-        for(Message message : messages)
-            result += message.contents;
-        clearMessages();
-        return result;
-    }
-
-    /**
-     * Returns the concatination of all messages in this Messenger cache,
-     * provided the source of the message is in the Collection of sources. The
-     * contents of the cache are cleared.
-     * @param sources the Collection of sources of the messages that will be
-     * included in the return value
-     * @return the concatination of all messages in this Messenger cache,
-     * provided the source of the message is in the Collection of sources
-     */
-    public String getMessages(Collection<Messenger> sources)
-    {
-        String result = "";
-        for(Message message : messages)
-            if(sources.contains(message.source))
-                result += message.contents;
-        messages.clear();
-        return result;
-    }
-
-    /**
-     * Adds the messages held by the given Messenger to the cache of this
-     * Messenger, then clears the cache of the other Messenger. The source of
-     * each message is preserved.
-     * @param messenger the messenger from which to retrieve messages
-     */
-    public void retrieveMessages(Messenger messenger)
-    {
-        messages.addAll(messenger.messages);
-        messenger.clearMessages();
-    }
-
-    private class Message
-    {
-        public final Messenger source;
-        public final String contents;
-
-        public Message(Messenger source, String contents)
-        {
-            this.source = source;
-            this.contents = contents;
-        }
-    }
+	/**
+	 * Retrieves the messages from this Messenger, leaving the Messenger's
+	 * messages blank.
+	 */
+	public final String getMessages()
+	{
+		String result = messages;
+		clearMessages();
+		return result;
+	}
 }

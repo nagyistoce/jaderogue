@@ -1,92 +1,70 @@
 package jade.fov;
 
+import jade.core.Actor;
 import jade.core.World;
-import jade.util.Coord;
+import jade.util.type.Coord;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Represents a field of vision algorithm. All FoV should be generated assuming
- * a square line of sight, and then given the option to filter on a circle.
+ * This interface represents something that can calculate field of vision.
  */
-public abstract class FoV
+public interface FoV
 {
-    private boolean circular;
+	/**
+	 * Returns the Coords that are visible from the given location
+	 */
+	public Collection<Coord> calcFoV(World world, int x, int y, int range);
 
-    /**
-     * Initializes the FoV.
-     * @param circular true if circular filter post-processing is desired
-     */
-    public FoV(boolean circular)
-    {
-        this.circular = circular;
-    }
+	/**
+	 * Returns the Coords that are visible from the Actor's location
+	 */
+	public Collection<Coord> calcFoV(Actor actor, int range);
 
-    /**
-     * Returns the location of all visible tiles from (x, y) on the world,
-     * within range r.
-     * @param world the world on which (x, y) refers to
-     * @param x the x value of the center of the field of vision
-     * @param y the y value of the center of the field of vision
-     * @param r the range of the field of vision
-     * @return the location of all the visible tiles from (x, y)
-     */
-    public final Set<Coord> getFoV(World world, int x, int y, int r)
-    {
-        Set<Coord> fov = calcFoV(world, x, y, r);
-        if(circular)
-            filterCircle(fov, x, y, r);
-        return fov;
-    }
+	public class FoVFactory
+	{
+		private static FoV raySquare;
+		private static FoV rayCircle;
+		private static FoV shadowSquare;
+		private static FoV shadowCircle;
 
-    /**
-     * Returns the location of all visible tiles from (x, y) on the world, where
-     * (x, y) is given by the Coord, within range r.
-     * @param world the world on which (x, y) refers to
-     * @param pos the value of the center of the field of vision
-     * @param r the range of the field of vision
-     * @return the location of all the visible tiles from (x, y)
-     */
-    public final Set<Coord> getFoV(World world, Coord pos, int r)
-    {
-        return getFoV(world, pos.x(), pos.y(), r);
-    }
+		/**
+		 * Raycasting with a square bound.
+		 */
+		public static FoV raySquare()
+		{
+			if(raySquare == null)
+				raySquare = new Raycast(false);
+			return raySquare;
+		}
 
-    /**
-     * Performs the actual calculation of field of vision. This method should
-     * consider the field to be a square with length 2 * r, centered at (x, y).
-     * @param world the world on which (x, y) refers to
-     * @param x the x value of the center of the field of vision
-     * @param y the y value of the center of the field of vision
-     * @param r the range of the field of vision
-     * @return the location of all the visible tiles from (x, y)
-     */
-    protected abstract Set<Coord> calcFoV(World world, int x, int y, int r);
+		/**
+		 * Raycasting with a circular bound.
+		 */
+		public static FoV rayCircle()
+		{
+			if(rayCircle == null)
+				rayCircle = new Raycast(true);
+			return rayCircle;
+		}
 
-    /**
-     * Removes an Coord from the field that are not with in the circle with the
-     * given radius and center.
-     * @param field the field of vision
-     * @param x the x value of the center of the field of vision
-     * @param y the y value of the center of the field of vision
-     * @param radius the radius of the circular filter
-     */
-    public static void filterCircle(Collection<Coord> field, int x, int y,
-            int radius)
-    {
-        Collection<Coord> out = new HashSet<Coord>();
-        radius++;
-        for(Coord coord : field)
-            if(!inCircle(x, y, coord.x(), coord.y(), radius))
-                out.add(coord);
-        field.removeAll(out);
-    }
+		/**
+		 * Shadowcasting with a square bound.
+		 */
+		public static FoV shadowSquare()
+		{
+			if(shadowSquare == null)
+				shadowSquare = new Shadowcast(false);
+			return shadowSquare;
+		}
 
-    private static boolean inCircle(int cx, int cy, int x, int y, int r)
-    {
-        final int a = x - cx;
-        final int b = y - cy;
-        return a * a + b * b < r * r;
-    }
+		/**
+		 * Shadowcasting with a circular bound.
+		 */
+		public static FoV shadowCircle()
+		{
+			if(shadowCircle == null)
+				shadowCircle = new Shadowcast(true);
+			return shadowCircle;
+		}
+	}
 }

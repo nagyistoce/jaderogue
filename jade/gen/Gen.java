@@ -1,69 +1,92 @@
 package jade.gen;
 
 import jade.core.World;
-import jade.util.Dice;
+import jade.util.type.Rect;
 
 /**
- * The base class for random map generators. These generators are generally
- * designed to allow chaining so that in decorator fashion, although decending
- * classes may either disallow or mandate chaining. The Gen will first ask its
- * chained Gen to perform its step, and the perform its own. In this way,
- * generators which place special features can be chained with generators with
- * provided basic levels.
+ * This interface represents something that can generate a map for a Jade World.
  */
-public abstract class Gen
+public interface Gen
 {
-    private Gen chained;
+	/**
+	 * Generates a map on the World with the specified seed.
+	 */
+	public void generate(World world, long seed);
 
-    /**
-     * Intializes a new Gen.
-     * @param chained the optional Gen (ie can be null)
-     */
-    public Gen(Gen chained)
-    {
-        this.chained = chained;
-    }
+	/**
+	 * Generates a map on the World in the given bounds with the specified seed.
+	 */
+	public void generate(World world, long seed, Rect rect);
 
-    /**
-     * Initializes a new Gen, with no chaining.
-     */
-    public Gen()
-    {
-        this(null);
-    }
+	public class GenFactory
+	{
+		private static Gen cellular;
+		private static Gen bsp;
+		private static Gen wilderness;
+		private static Gen town;
+		private static Gen maze;
+		private static Gen traditional;
 
-    /**
-     * Randomly generates or modifies the world map using the provided Dice for
-     * random number generation. This method should always generate the exact
-     * same map given dice with identical states (ie reseed just before calling
-     * this method).
-     * @param world The World to be modified by the generator
-     * @param dice the Dice used for random number generation
-     */
-    public void generate(World world, Dice dice)
-    {
-        if(chained != null)
-            chained.generate(world, dice);
-        genStep(world, dice);
-    }
+		/**
+		 * Uses cellular automaton to generate cave like maps.
+		 */
+		public static Gen cellular()
+		{
+			if(cellular == null)
+				cellular = new Cellular();
+			return cellular;
+		}
 
-    /**
-     * Randomly generates or modifies the world map using the global instance of
-     * Dice for random number generation.
-     * @param world The World to be modified by the generator
-     */
-    public final void generate(World world)
-    {
-        generate(world, Dice.global);
-    }
+		/**
+		 * Uses binary space partitioning to generate traditional maps with rooms
+		 * and corridors.
+		 */
+		public static Gen bsp()
+		{
+			if(bsp == null)
+				bsp = new BSP();
+			return bsp;
+		}
 
-    /**
-     * Performs the modifications of this Gen on the world, using the given Dice
-     * for random number generation. This step can be as simple as placing some
-     * feature on a map, to actual level generation. This method should always
-     * generate the exact same map given dice with identical states.
-     * @param world the World to be modified by the generator
-     * @param dice the Dice used for random number generation
-     */
-    protected abstract void genStep(World world, Dice dice);
+		/**
+		 * Generates a fenced space with trees.
+		 */
+		public static Gen wilderness()
+		{
+			if(wilderness == null)
+				wilderness = new Wilderness(false);
+			return wilderness;
+		}
+
+		/**
+		 * Generates a wilderness with rectangular buildings.
+		 */
+		public static Gen town()
+		{
+			if(town == null)
+				town = new Wilderness(true);
+			return town;
+		}
+		
+		/**
+		 * Generates a perfect maze
+		 */
+		public static Gen maze()
+		{
+			if(maze == null)
+				maze = new Maze();
+			return maze;
+		}
+		
+		/**
+		 * Generates a grid of interconnected rooms like the origional rogue
+		 */
+		public static Gen traditional(int roomsX, int roomsY)
+		{
+			if(traditional == null)
+				traditional = new Traditional(roomsX, roomsY);
+			((Traditional)traditional).setDims(roomsX, roomsY);
+			return traditional;
+		}
+	}
 }

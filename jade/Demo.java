@@ -1,79 +1,142 @@
 package jade;
 
 import jade.core.Actor;
+import jade.core.Console;
 import jade.core.World;
-import jade.fov.FoV;
-import jade.fov.Raycast;
-import jade.gen.Gen;
-import jade.gen.maps.BSP;
-import jade.ui.TermPanel;
-import jade.ui.Terminal;
-import jade.ui.Terminal.Camera;
-import jade.ui.aim.Aim;
-import jade.ui.aim.Select;
-import jade.util.ColoredChar;
-import jade.util.Coord;
-import jade.util.Direction;
-import java.util.Set;
+import jade.fov.FoV.FoVFactory;
+import jade.gen.Gen.GenFactory;
+import jade.util.Dice;
+import jade.util.Tools;
+import jade.util.type.ColoredChar;
+import jade.util.type.Coord;
+import jade.util.type.Direction;
+import java.awt.Color;
+import java.util.Collection;
 
-/**
- * A simple demo of some Jade Rogue features.
- */
 public class Demo
 {
-    private static class Player extends Actor implements Camera
-    {
-        private FoV fov;
+	private static Console console;
+	private static boolean display = true;
 
-        public Player()
-        {
-            super(new ColoredChar('@'));
-            fov = new Raycast(false);
-        }
+	public static void main(String[] args) throws InterruptedException
+	{
+		console = Console.getFramedConsole("Demo");
+		console.buffChar(0, 0, '@', Color.white);
+		console.refreshScreen();
+		World world = new DemoWorld();
+		GenFactory.traditional(3, 3).generate(world, System.currentTimeMillis());
+		Actor hero = new DemoActor();
+		world.addActor(hero, Dice.global);
+		for(int i = 0; i < 5; i++)
+			world.addActor(new DemoTrap(), Dice.global);
+		while(!hero.isExpired())
+		{
+			if(display)
+				displayWorld(world);
+			else
+				displayWorld2(world, hero);
+			world.tick();
+		}
+		console.clearBuffer();
+		if(hero.isExpired())
+			console.buffString(0, 0, "The trap got you!", Color.white);
+		console.refreshScreen();
+		console.getKey();
+		console.exit();
+	}
 
-        @Override
-        public Set<Coord> getFoV()
-        {
-            return fov.getFoV(world(), pos(), 5);
-        }
-    }
+	private static void displayWorld(World world)
+	{
+		console.clearBuffer();
+		for(int x = 0; x < world.width; x++)
+			for(int y = 0; y < world.height; y++)
+				console.buffChar(x, y, world.look(x, y));
+		console.refreshScreen();
+	}
 
-    /**
-     * Runs the demo.
-     * @param args command line args - nothing is done with them
-     */
-    public static void main(String[] args)
-    {
-        Terminal term = TermPanel.getFramedTerm("Jade Rogue");
-        World world = new World(80, 24);
-        Gen gen = new BSP();
-        gen.generate(world);
-        Player player = new Player();
-        world.addActor(player);
-        term.addCamera(player, new Coord(6, 6));
-        Aim aim = new Select(Player.class);
-        for(int i = 0; i < 30; i++)
-        {
-            world.addActor(new Actor(new ColoredChar('D')));
-            world.addActor(new Player());
-        }
+	private static void displayWorld2(World world, Actor actor)
+	{
+		Collection<Coord> fov = FoVFactory.shadowCircle().calcFoV(actor, 10);
+		console.clearBuffer();
+		for(Coord coord : fov)
+			console.buffChar(coord, world.look(coord));
+		console.refreshScreen();
+	}
 
-        char key;
-        do
-        {
-            term.clearBuffer();
-            term.bufferCamera(player);
-            term.updateScreen();
+	private static class DemoWorld extends World
+	{
+		@SuppressWarnings("unchecked")
+		public DemoWorld()
+		{
+			super(Console.DEFAULT_WIDTH, Console.DEFAULT_HEIGHT);
+			setDrawOrder(DemoActor.class, DemoTrap.class);
+		}
 
-            key = term.getKey();
-            Direction d = Direction.viKeyDir(key);
-            if(d != null)
-                player.move(d);
-            else if(key == 't')
-                System.out.println(aim.getAim(term, player));
-        }
-        while(key != 'q');
+		@Override
+		public void tick()
+		{
+			for(DemoActor actor : getActors(DemoActor.class))
+				actor.act();
+			for(DemoTrap trap : getActors(DemoTrap.class))
+				trap.act();
+			removeExpired();
+		}
+	}
 
-        term.exit();
-    }
+	private static class DemoActor extends Actor
+	{
+		public DemoActor()
+		{
+			super('@', Color.white);
+		}
+
+		@Override
+		public void act()
+		{
+			char key = console.getKey();
+			Direction dir = Tools.keyToDir(key, true, false);
+			if(dir != null)
+				move(dir);
+			else if(key == 'q')
+				console.exit();
+			else if(key == '\n')
+				display = !display;
+		}
+		
+		@Override
+		public void move(int dx, int dy)
+		{
+			if(world().passable(x() + dx, y() + dy))
+				super.move(dx, dy);
+		}
+	}
+
+	private static class DemoTrap extends Actor
+	{
+		private int timer = 10;
+
+		public DemoTrap()
+		{
+			super('*', Color.red);
+		}
+
+		@Override
+		public void act()
+		{
+			if(!held())
+			{
+				DemoActor hero = world().getActorAt(pos(), DemoActor.class);
+				if(hero != null)
+				{
+					attachTo(hero);
+					hero.setFace(new ColoredChar('@', Color.red));
+				}
+			}
+			else
+			{
+				if(timer-- == 0)
+					holder().expire();
+			}
+		}
+	}
 }

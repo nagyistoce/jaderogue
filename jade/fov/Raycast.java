@@ -1,49 +1,46 @@
 package jade.fov;
 
+import jade.core.Actor;
 import jade.core.World;
 import jade.path.Bresenham;
-import jade.util.Coord;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import jade.util.Tools;
+import jade.util.type.Coord;
+import java.util.Collection;
+import java.util.TreeSet;
 
 /**
- * Uses the simple and fast raycasting algorithm to calculate line of sight.
+ * An implementation of FoV that utilizes a simple raycasting algorithm.
  */
-public class Raycast extends FoV
+public class Raycast extends Bresenham implements FoV
 {
-    private Bresenham raycaster;
+	private final boolean circular;
 
-    /**
-     * Initializes the FoV.
-     * @param circular true if circular filter post-processing is desired
-     */
-    public Raycast(boolean circular)
-    {
-        super(circular);
-        raycaster = new Bresenham();
-    }
+	protected Raycast(boolean circular)
+	{
+		this.circular = circular;
+	}
 
-    @Override
-    protected Set<Coord> calcFoV(World world, int x, int y, int r)
-    {
-        Set<Coord> result = new HashSet<Coord>();
-        result.add(new Coord(x, y));
-        for(int dx = x - r; dx <= x + r; dx++)
-        {
-            result.addAll(castray(world, x, y, dx, y - r));
-            result.addAll(castray(world, x, y, dx, y + r));
-        }
-        for(int dy = y - r; dy <= y + r; dy++)
-        {
-            result.addAll(castray(world, x, y, x + r, dy));
-            result.addAll(castray(world, x, y, x - r, dy));
-        }
-        return result;
-    }
+	public Collection<Coord> calcFoV(World world, int x, int y, int range)
+	{
+		final Collection<Coord> result = new TreeSet<Coord>();
+		result.add(new Coord(x, y));
+		for(int dx = x - range; dx <= x + range; dx++)
+		{
+			result.addAll(castray(world, x, y, dx, y - range));
+			result.addAll(castray(world, x, y, dx, y + range));
+		}
+		for(int dy = y - range; dy <= y + range; dy++)
+		{
+			result.addAll(castray(world, x, y, x + range, dy));
+			result.addAll(castray(world, x, y, x - range, dy));
+		}
+		if(circular)
+			Tools.filterCircle(result, x, y, range);
+		return result;
+	}
 
-    private List<Coord> castray(World world, int x1, int y1, int x2, int y2)
-    {
-        return raycaster.calcPath(world, new Coord(x1, y1), new Coord(x2, y2));
-    }
+	public Collection<Coord> calcFoV(Actor actor, int range)
+	{
+		return calcFoV(actor.world(), actor.x(), actor.y(), range);
+	}
 }

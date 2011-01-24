@@ -1,309 +1,249 @@
 package jade.core;
 
-import jade.util.ColoredChar;
-import jade.util.Coord;
-import jade.util.Direction;
+import jade.util.type.ColoredChar;
+import jade.util.type.Coord;
+import jade.util.type.Direction;
+import java.awt.Color;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Represents anything that performs any action in a Jade World.
+ * Represents a basic Actor in a Jade World.
  */
-public class Actor extends Messenger
+public abstract class Actor extends Messenger implements Serializable
 {
-    private ColoredChar face;
-    private World world;
-    private Coord pos;
-    private boolean expired;
-    private Actor holder;
-    private Set<Actor> holds;
+	private ColoredChar face;
+	private Coord pos;
+	private World world;
+	private Actor holder;
+	private HashSet<Actor> holds;
+	private boolean expired;
 
-    /**
-     * Constructs a new, unbound Actor with the given face.
-     * @param face the face of the new Actor
-     */
-    public Actor(ColoredChar face)
-    {
-        this.face = face;
-        world = null;
-        pos = new Coord();
-        expired = false;
-        holder = null;
-        holds = new HashSet<Actor>();
-    }
+	/**
+	 * Creates an Actor
+	 */
+	public Actor(char face, Color color)
+	{
+		this(new ColoredChar(face, color));
+	}
 
-    /**
-     * Returns the face of the Actor
-     * @return the face of the Actor
-     */
-    public ColoredChar face()
-    {
-        return face;
-    }
+	/**
+	 * Creates an Actor
+	 */
+	public Actor(ColoredChar face)
+	{
+		this.face = face;
+		pos = new Coord();
+		holds = new HashSet<Actor>();
+		expired = false;
+	}
 
-    /**
-     * Changes the face of this Actor to a new one. Note that a null face is
-     * allowed, and implies that the Actor should never be drawn on screen, or
-     * have its face returned in World look methods.
-     * @param face the new face of the Actor
-     */
-    public void changeFace(ColoredChar face)
-    {
-        this.face = face;
-    }
+	/**
+	 * Default behavior for the actor. Called by World.tick()
+	 */
+	public abstract void act();
 
-    /**
-     * Returns the world on which the Actor resides, or null if the actor is not
-     * bound to a World.
-     * @return the world on which the Actor currently resides
-     */
-    public World world()
-    {
-        return world;
-    }
+	/**
+	 * Sets the position of the Actor
+	 */
+	public final void setPos(int x, int y)
+	{
+		assert (bound());
+		assert (!held());
+		world.removeFromGrid(this);
+		pos.move(x, y);
+		world.addToGrid(this);
+	}
 
-    /**
-     * Returns true if the Actor is bound to a World.
-     * @return true if the Actor is bound to a World
-     */
-    public boolean bound()
-    {
-        return world != null;
-    }
+	/**
+	 * Sets the position of the Actor
+	 */
+	public final void setPos(Coord pos)
+	{
+		setPos(pos.x(), pos.y());
+	}
 
-    /**
-     * Returns true if the Actor is bound to the given World.
-     * @param world the world being tested
-     * @return true if the Actor is bound to the given World
-     */
-    public boolean bound(World world)
-    {
-        return this.world == world;
-    }
+	/**
+	 * Moves the Actor by a specified amount
+	 */
+	public void move(int dx, int dy)
+	{
+		setPos(x() + dx, y() + dy);
+	}
 
-    /**
-     * Returns the x value of the location of the Actor on the World. An error
-     * is raised if the Actor is not bound to a World.
-     * @return the x value of the location of the Actor on the World
-     */
-    public int x()
-    {
-        assertBound();
-        return pos.x();
-    }
+	/**
+	 * Moves the Actor one tile in a specified direction
+	 */
+	public final void move(Direction dir)
+	{
+		move(dir.dx, dir.dy);
+	}
 
-    /**
-     * Returns the y value of the location of the Actor on the World. An error
-     * is raised if the Actor is not bound to a World.
-     * @return the y value of the location of the Actor on the World
-     */
-    public int y()
-    {
-        assertBound();
-        return pos.y();
-    }
+	/**
+	 * Gets the x location of the Actor
+	 */
+	public final int x()
+	{
+		assert (bound());
+		return pos.x();
+	}
 
-    /**
-     * Returns a copy of the location of the Actor on the World. An error is
-     * raised if the Actor is not bound to a World. Note that the result is a
-     * copy, and changes to this Coord will not be reflected in the state of the
-     * Actor.
-     * @return the location of the Actor on the World
-     */
-    public Coord pos()
-    {
-        assertBound();
-        return new Coord(pos);
-    }
+	/**
+	 * Gets the x location of the Actor
+	 */
+	public final int y()
+	{
+		assert (bound());
+		return pos.y();
+	}
 
-    /**
-     * Sets the position of the Actor on the World to (x, y). An error is raised
-     * if the Actor is not bound to a World or if it is held by another Actor.
-     * @param x the x value of the new location of the Actor on the World
-     * @param y the y value of the new location of the Actor on the World
-     */
-    public void setPos(int x, int y)
-    {
-        assertBound();
-        assertNotHeld();
-        world.unoccupyGrid(this);
-        pos.move(x, y);
-        world.occupyGrid(this);
-    }
+	/**
+	 * Returns the position of the Actor. Changes to this Coord don't affect the
+	 * Actor.
+	 */
+	public final Coord pos()
+	{
+		return new Coord(pos);
+	}
 
-    /**
-     * Sets the position of the Actor on the World to the value of the given
-     * Coord. An error is raised if the Actor is not bound to a World or if it
-     * is held by another Actor.
-     * @param coord the new position of the Actor on the World
-     */
-    public final void setPos(Coord coord)
-    {
-        setPos(coord.x(), coord.y());
-    }
+	/**
+	 * Returns the Actors held by this Actor. Changes to this collection don't
+	 * affect the Actor.
+	 */
+	public final Collection<Actor> holds()
+	{
+		return new HashSet<Actor>(holds);
+	}
 
-    /**
-     * Sets the position of the Actor on the World to (x + dx, y + dy). An error
-     * is raised if the Actor is not bound to a World or if it is held by
-     * another Actor.
-     * @param dx the change x
-     * @param dy the change y
-     */
-    public final void move(int dx, int dy)
-    {
-        setPos(x() + dx, y() + dy);
-    }
+	/**
+	 * Attaches this Actor to another.
+	 */
+	public final void attachTo(Actor actor)
+	{
+		assert (!held());
+		if(bound())
+			world().removeActor(this);
+		if(actor.bound())
+		{
+			setWorld(actor.world);
+			world.registerActor(this);
+		}
+		this.holder = actor;
+		actor.holds.add(this);
+		pos = actor.pos;
+		getHolderPos();
+	}
 
-    /**
-     * Sets the position of the Actor on the World to (x + dx, y + dy) where
-     * delta defines (dx, dy). An error is raised if the Actor is not bound to a
-     * World or if it is held by another Actor.
-     * @param delta the change in position
-     */
-    public final void move(Coord delta)
-    {
-        move(delta.x(), delta.y());
-    }
+	private void getHolderPos()
+	{
+		for(Actor held : holds)
+		{
+			held.pos = pos;
+			held.getHolderPos();
+		}
+	}
 
-    /**
-     * Sets the position of the Actor to be one step in the given direction. An
-     * error is raised if the Actor is not bound to a World or if it is held by
-     * another Actor.
-     * @param dir the direction of change
-     */
-    public final void move(Direction dir)
-    {
-        move(dir.dx(), dir.dy());
-    }
+	/**
+	 * Detaches this Actor from its holder
+	 */
+	public final void detachFrom()
+	{
+		assert (held());
+		holder.holds.remove(this);
+		Coord holderPos = new Coord(holder.pos);
+		holder = null;
+		if(bound())
+			setPos(holderPos.x(), holderPos.y());
+	}
 
-    /**
-     * Expires this Actor and every Actor held by this one, marking them for
-     * removal from its World.
-     */
-    public void expire()
-    {
-        expired = true;
-        for(Actor held : holds)
-            held.expire();
-    }
+	/**
+	 * Returns true if this Actor is held.
+	 */
+	public final boolean held()
+	{
+		return holder != null;
+	}
 
-    /**
-     * Returns true if the Actor is expired, which means it is marked for
-     * removal from its World.
-     * @return true if the Actor is expired
-     */
-    public boolean expired()
-    {
-        return expired;
-    }
+	/**
+	 * Returns the Actor that holds this Actor.
+	 */
+	public final Actor holder()
+	{
+		return holder;
+	}
 
-    /**
-     * Attaches this Actor to the given Actor. The position of this Actor then
-     * becomes that of the new holder. This Actor is removed from its current
-     * World and bount to the World of the new holder, although it will not be
-     * found on the grid of the World. Any Actor held by this Actor will also be
-     * moved with the new holder. An error is raised if the Actor is already
-     * held.
-     * @param actor the new holder
-     */
-    public void attach(Actor actor)
-    {
-        assertNotHeld();
-        if(bound())
-            world.removeActor(this);
-        if(actor.bound())
-        {
-            setWorld(actor.world);
-            world.registerActor(this);
-        }
-        holder = actor;
-        actor.holds.add(this);
-        pos = holder.pos;// holder position IS our own
-        setHeldPos();
-    }
+	/**
+	 * True if the Actor is bound to a World
+	 */
+	public final boolean bound()
+	{
+		return world != null;
+	}
 
-    /**
-     * Releases this Actor from its holder. The position of this Actor becomes
-     * independent of its former holder. It is also recorded as occupying the
-     * World grid. An error is raised by this method if the Actor was not held.
-     */
-    public void detach()
-    {
-        assertHeld();
-        holder.holds.remove(this);
-        pos = new Coord(holder.pos);
-        setHeldPos();
-        holder = null;
-        if(bound())
-            setPos(pos);
-    }
+	/**
+	 * Returns the World this Actor is bound to.
+	 */
+	public final boolean boundTo(World world)
+	{
+		assert (world != null);
+		return this.world == world;
+	}
 
-    /**
-     * Returns true if the Actor is currently held by another.
-     * @return true if the Actor is currently held by another
-     */
-    public boolean held()
-    {
-        return holder != null;
-    }
+	/**
+	 * Returns true if this Actor is bound
+	 */
+	public final boolean isExpired()
+	{
+		return expired;
+	}
 
-    /**
-     * Returns true if the given Actor is the holder of this Actor
-     * @param actor the Actor which is being queried as the holder
-     * @return true if the given Actor is the holder of this Actor
-     */
-    public boolean held(Actor actor)
-    {
-        return holder == actor;
-    }
+	/**
+	 * Expires this Actor and all those it holds. This is a mechanism for marking
+	 * actors for removal.
+	 */
+	public void expire()
+	{
+		expired = true;
+		for(Actor held : holds)
+			held.expire();
+	}
 
-    /**
-     * Returns the current holder of this Actor, or null if there is none
-     * @return the current holder of this Actor
-     */
-    public Actor holder()
-    {
-        return holder;
-    }
+	/**
+	 * Returns the face of this Actor
+	 */
+	public final ColoredChar look()
+	{
+		return face;
+	}
 
-    /**
-     * Returns all Actors currently held by this one
-     * @return all Actors currently held by this one
-     */
-    public Iterable<Actor> holds()
-    {
-        return holds;
-    }
+	/**
+	 * Changes the face of this Actor
+	 */
+	public final void setFace(ColoredChar face)
+	{
+		this.face = face;
+	}
 
-    void setWorld(World world)
-    {
-        this.world = world;
-    }
+	/**
+	 * Returns the World this Actor is bound to.
+	 */
+	public World world()
+	{
+		return world;
+	}
 
-    private void setHeldPos()
-    {
-        for(Actor held : holds)
-        {
-            held.pos = pos;
-            held.setHeldPos();
-        }
-    }
+	final void setWorld(World world)
+	{
+		assert (!held() || holder.world == world);
+		this.world = world;
+		for(final Actor held : holds)
+			held.setWorld(world);
+	}
 
-    private void assertBound()
-    {
-        if(!bound())
-            throw new IllegalStateException("Actor not bound!");
-    }
-
-    private void assertNotHeld()
-    {
-        if(held())
-            throw new IllegalStateException("Actor held!");
-    }
-
-    private void assertHeld()
-    {
-        if(!held())
-            throw new IllegalStateException("Actor not held!");
-    }
+	@Override
+	public String toString()
+	{
+		return face.toString();
+	}
 }
