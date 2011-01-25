@@ -1,3 +1,4 @@
+#labels Featured
 = Jade Rogue =
 
 Welcome to the Jade Rogue wiki! This is the place to find all sorts of
