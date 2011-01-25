@@ -1,1 +1,159 @@
-== UNDER CONSTRUCTION ==
+This tutorial aims to take you through the Demo included in the source
+distribution of Jade. The code we will examine here is slightly trimmed down.
+The actual demo has some silly business about a brain eating zombie. Still, what
+is shown will get you through the basics of the Jade system, and should be enough
+to get you started. However, this tutorial assumes a working knowledge of Java.
+If you need to learn Java, there are a myriad of other resources online that can
+help you. With that said, lets dive in!
+
+Lets start by looking at the main of the Demo class. The first line shows us
+how to start using a Terminal, more specifically a TermPanel. 
+{{{
+    Terminal term = TermPanel.getFramedTerm("Jade Rogue Demo");
+}}}
+This class provides console emulation in a JPanel. This panel can be access via 
+{{{ term.getScreen() }}} and embedded in any container you want. We'll use
+the convience method and put it in a JFrame.
+
+Now on to world generation. Jade has a class called World which is the basic
+map class. It holds all the actors, and has lots of methods for get the actors
+you want (more on this later). For now lets just generate the world.
+{{{
+        World world = new Level();
+        Gen gen = new BSP();
+        gen.generate(world);
+}}}
+Thats all there is to it! There are many different generation algorithms that
+can be found in the package {{{ jade.gen.mapgen }}}. Most have a few parameters
+you can play with to get the map you want. Check out the features wiki page for
+more in depth information on the generation system (especially chaining...its
+pretty cool).
+
+Now lets add a player. If you look ahead, you'll see that our demo Player class
+extends Actor and implements Camera. Being an actor lets the player do stuff in
+the World, as we'll see when we examine the Level code. Being a camera gets us
+some nifty drawing ability, as we'll see further down.
+{{{
+        Player player = new Player(term);
+        world.addActor(player);
+        term.addCamera(player, new Coord(6, 6));
+}}}
+Notice how easy that was to add an Actor! This method is overridden to allow you
+to place the Actor where you want, or to place it randomly as we have done here.
+We had to register the camera with the terminal so that the terminal knows where
+to place what the camera sees on screen.
+
+Now onto the main game loop. Most of these loops will have very similar
+structure, though they might be slightly different.
+{{{
+        while(!player.expired())
+        {
+            term.clearBuffer();
+            term.bufferCamera(player);
+            term.updateScreen();
+
+            world.tick();
+        }
+}}}
+The first thing to notice is this funny business of expired. In Jade lingo, to
+be expired means you are marked for removal. In the case of monsters, this might
+occur when the player slays it. Other actors such as spells, items, timers,
+traps, etc might be expired due to other criteria (oh and yes, Actor really does
+represent _anything_ that acts in the World, not just monsters and players).
+
+Next we see the drawing code. There isn't much to it. All we do is tell the
+terminal to draw what the player sees, and update the screen. There are alot of
+other drawing methods worth looking at such as {{{ bufferChar() }}} or
+{{{ bufferRelative() }}, but you can check these out in the features wiki page.
+
+Lets move on to the code for our Player class. As previously stated it extends
+Actor and implements Player. This means we have to implement two methods: 
+{{{ act() }}} and {{{ getFoV() }}}. Lets look at {{{ act() }}} first, which is
+an abstract method of Actor.
+{{{
+        public void act()
+        {
+            char key = term.getKey();
+            switch(key)
+            {
+            case Terminal.ESC:
+            case 'q':
+                expire();// mark the actor for removal
+                break;
+            default:
+                Direction dir = Direction.keyDir(key);
+                if(dir != null)
+                    move(dir);// see setPos below
+            }
+        }
+}}}
+This is basically all the logic to move the Player according to the key press
+(or quit with 'q' or 'esc'). This code will be called by the world every tick. 
+Do note that as is, the Player will be able to move through walls. Overriding
+the {{{ setPos() }}} method to disallow moving through walls is easy (see the
+actual Demo.java file in the source).
+
+Now lets look at the {{{ getFoV() }}} method. This is a method of the Camera
+interface and it basically descrives what tiles are visible for the Camera.
+{{{
+        public Set<Coord> getFoV()
+        {
+            return fov.getFoV(world(), pos(), viewRange);
+        }
+}}}
+Like map generation, field of view calculation is very easy. Currently there are
+two algorithms implemented. Check out the features page for more information. In
+order to use a FoV object, all you have to do is pass is the world you are on, 
+the position you want, and the radius of the field of view. The result is the
+coordinate of every visible tile. Currently visibility is determined by the
+{{{ passable() }}} method on the world.
+
+Now lets look at the Level class, which extends World. As stated before, the 
+World is the play ground of Actors. It also contains the method {{{ tick() }}},
+which is meant to drive the game logic.
+{{{
+        public void tick()
+        {
+            for(Player actor : getActors(Player.class))
+                actor.act();
+            for(Zombie zombie : getActors(Zombie.class))
+                zombie.act();
+            removeExpired();
+        }
+}}}
+First off, notice the {{{ getActors() }}}. There are variations on this method,
+some returning single Actors, and some querying a single location on the map.
+All of them allow you to grab exactly the set of Actors you want. Notice too
+that the return type of any variation of {{{ getActor() }}} is based on the
+class that you pass in as a parameter. Nifty huh?
+
+It is also worth noting that the method {{{ removeExpired() }}} takes all those
+actors which have been marked for removal and does just that - removes them.
+
+Next we should take a look at the {{{ lookAll() }}} method. It describes what is
+visible at any given location. For example the tile of the floor should be
+visible, as will the face of many Actor occupants. This method returns them all
+in an ordered list, so you know what should be drawn on top, and what goes on
+the bottom. 
+{{{
+        public List<ColoredChar> lookAll(int x, int y)
+        {
+            List<ColoredChar> look = new ArrayList<ColoredChar>();
+            look.add(tileAt(x, y));
+            for(Zombie zombie : getActorsAt(Zombie.class, x, y))
+                look.add(zombie.face());
+            for(Player player : getActorsAt(Player.class, x, y))
+                look.add(player.face());
+            return look;
+        }
+    }
+}}}
+On further thing to note about {{{ lookAll() }}} is that normally you will want
+to call {{{ look() }}} instead, which uses {{{ lookAll() }}} but only returns
+the tile that should be drawn.
+
+So there you have it - you're ready to use Jade to create your masterpiece.
+Probably this was just enough information to whet your whistle - much more
+detailed explainations and code examples can be found in the features section
+of the wiki. Javadocs for the entire code base are also posted on the wiki.
+Happy coding!
