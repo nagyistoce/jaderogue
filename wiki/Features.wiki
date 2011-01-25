@@ -1,1 +1,34 @@
-== COMING SOON ==
+The following is an overview of the various features in Jade Rogue. Each feature
+set has its own page, which then gives much more in depth descriptions of how
+Jade implements these features, with code examples. Consider these pages the
+complete tutorial.
+
+=== [Core Core - Actors and World] ===
+
+The Jade core contains the basic framework for the Jade System. The World 
+represents the map and the Actor anything that acts on a World.
+
+=== [FoV Field of Vision] ===
+
+Field of vision is the calculation of every thing that is visible from a given
+tile. It can be used for figuring out which tiles the player can see, as well as
+more clever things like ball spells.
+
+=== [Path Pathfinding and Line of Sight] ===
+
+Path finding solves the problem of calculating the set of moves needed to go
+from point A to point B. These paths can have added constraints, such as in the 
+case of line of sight, which simple draws a straith path between points. In 
+general, path finding can be used to plan the moves for your ai.
+
+== [UI Terminal Emulate and Interface] ==
+
+One of the biggest weaknesses of Java for roguelike developement is the lack of
+console support. Jade overcomes this with a Terminal class. The most portable
+Terminal uses a graphical panel and emulates a console. Jade also helps you out
+with interface issues such as targeting systems.
+
+== [Util Utility] ==
+
+In addition to all these nice features, Jade includes a few extra class that
+should be useful in your development.
