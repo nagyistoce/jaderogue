@@ -6,9 +6,14 @@ to get you started. However, this tutorial assumes a working knowledge of Java.
 If you need to learn Java, there are a myriad of other resources online that can
 help you. With that said, lets dive in!
 
-First off you need to get the code. It can be found in the source tab of this project website. You can either browse the code online, or check the code out using svn. If you just want the .class files, the you can head to the downloads section and grab the alpha 1 .jar file.
+First off you need to get the code. It can be found in the source tab of this
+project website. You can either browse the code online, or check the code out
+using svn. If you just want the .class files, the you can head to the downloads
+section and grab the alpha 1 .jar file.
 
-Now that you have the code lets take a look at Demo.java, in the package jade. Specifically lets look at the main method. The first line shows us how to start using a Terminal, more specifically a !TermPanel. 
+Now that you have the code lets take a look at Demo.java, in the package jade.
+Specifically lets look at the main method. The first line shows us how to start
+using a Terminal, more specifically a !TermPanel. 
 {{{
     Terminal term = TermPanel.getFramedTerm("Jade Rogue Demo");
 }}}

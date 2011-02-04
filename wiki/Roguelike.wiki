@@ -19,33 +19,46 @@ While the exact definition of a roguelike game is a little hard to pin down.
 For every characteristic in the following list, there is a good roguelike that
 breaks the rule. That said, roguelikes tend to have these features:
   * Random Content - one of the defining features of a roguelike is that the
-levels are all generated randomly. This means that no two games are alike, and
-new tactical problems can be encountered all the time.
+    levels are all generated randomly. This means that no two games are alike, and
+    new tactical problems can be encountered all the time.
   * Single Player - just like the original, in a roguelike a single player
-assumes the role of some brave adventurer - most often a daring '@' symbol.
+    assumes the role of some brave adventurer - most often a daring '@' symbol.
   * Hack-n-slash - the major focus of most roguelikes is a dungeon filled with
-lots of monsters to kill. Finding the right balance between hack-n-slash and
-grinding is a challenge to modern roguelike developers.
+    lots of monsters to kill. Finding the right balance between hack-n-slash and
+    grinding is a challenge to modern roguelike developers.
   * Grid Based - the original rogue was played on a terminal, so the maps were
-all grid based.
+    all grid based.
   * Turn Based - roguelike game play does not happen in real time, allowing the
-player time to agonize over tough tactical decisions
+    player time to agonize over tough tactical decisions
   * Permadeath - just like the original rogue, most roguelike games have no redo
-or back loads if you die. Death is permanent. It is generally considered
-cheating (or save-scumming) to do so.
+    or back loads if you die. Death is permanent. It is generally considered
+    cheating (or save-scumming) to do so.
   * Minimal Story - most of the time the story is along the lines of "you need
-to fetch the <artifact of awesomeness> at the bottom of a dungeon." Other than
-that, its basically about killing lots of monsters in a random dungeon.
+    to fetch the <artifact of awesomeness> at the bottom of a dungeon." Other than
+    that, its basically about killing lots of monsters in a random dungeon.
   * Ascii Graphics - proving that gameplay can compansate for poor graphics,
-many, if not most, roguelikes are played with ascii graphics, although many
-games, especially the newest ones, have the option to replace the ascii with
-graphical tile sets. It is my opinion that the ascii is awesome - you won't see
-me playing any roguelikes with tile sets.
+    many, if not most, roguelikes are played with ascii graphics, although many
+    games, especially the newest ones, have the option to replace the ascii with
+    graphical tile sets. It is my opinion that the ascii is awesome - you won't see
+    me playing any roguelikes with tile sets.
   * Fantasy Setting - while there are a few scifi entries in the roguelike
-genre, the vast majority are set in some sort of fantasy setting full of elves,
-orcs, and dragons. Tolkien lore is another common theme.
+    genre, the vast majority are set in some sort of fantasy setting full of elves,
+    orcs, and dragons. Tolkien lore is another common theme.
   * DnD Combat - Most roguelikes have some sort of combat system that looks like
-combat from a (very much simplified) dungeons and dragons. Dice rolls determine
-hits, misses, damage, and whether your spell succeeded.
+    combat from a (very much simplified) dungeons and dragons. Dice rolls determine
+    hits, misses, damage, and whether your spell succeeded.
   * Small Open Source Projects - while there are a few exceptions, most
-roguelikes are small open source projects with a single developer.
+    roguelikes are small open source projects with a single developer.
+
+=== Major Roguelikes ===
+
+These are summaries of some of the roguelikes that I play. This list is in no
+way comprehensive, just representative of a few I like.
+
+====== Angband ======
+
+====== Dungeon Crawl ======
+
+====== MAngband ======
+
+====== Dwarf Fortress ======

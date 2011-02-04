@@ -27,7 +27,7 @@ from point A to point B. These paths can have added constraints, such as in the
 case of line of sight, which simple draws a straith path between points. In 
 general, path finding can be used to plan the moves for your ai.
 
-== [UI Terminal Emulate and Interface] ==
+== [UI Terminal Emulation and Interface] ==
 
 One of the biggest weaknesses of Java for roguelike developement is the lack of
 console support. Jade overcomes this with a Terminal class. The most portable

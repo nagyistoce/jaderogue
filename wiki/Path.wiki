@@ -1,0 +1,11 @@
+== Path ==
+
+==== Bresenham ====
+
+==== Graph Search ====
+
+====== A* ======
+
+====== Greedy ======
+
+====== Uniform ======

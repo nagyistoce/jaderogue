@@ -1,0 +1,7 @@
+==== ColoredChar ====
+
+==== Coord ====
+
+==== Dice ====
+
+==== Direction ====
