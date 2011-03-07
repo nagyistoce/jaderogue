@@ -73,7 +73,7 @@ other drawing methods worth looking at such as {{{ bufferChar() }}} or
 {{{ bufferRelative() }}, but you can check these out in the features wiki page.
 
 Lets move on to the code for our Player class. As previously stated it extends
-Actor and implements Player. This means we have to implement two methods: 
+Actor and implements Camera. This means we have to implement two methods: 
 {{{ act() }}} and {{{ getFoV() }}}. Lets look at {{{ act() }}} first, which is
 an abstract method of Actor.
 {{{
@@ -100,7 +100,7 @@ the {{{ setPos() }}} method to disallow moving through walls is easy (see the
 actual Demo.java file in the source).
 
 Now lets look at the {{{ getFoV() }}} method. This is a method of the Camera
-interface and it basically descrives what tiles are visible for the Camera.
+interface and it basically describes what tiles are visible to the Camera.
 {{{
         public Set<Coord> getFoV()
         {
