@@ -1,0 +1,34 @@
+TODO:
+    CTF Basics
+        map - done
+        flaggers - done
+        flag - done
+        win condition - done
+    PotentialFields
+        see tutorial by Goodrich
+            http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.115.3259&rep=rep1&type=pdf
+        Attractive - done
+        Repulsive - done
+        Random
+        Backtrace
+        Perpendicular
+        Uniform
+    Individual Behaviors (weights on field influences)
+        Attacker and Defender
+        State based
+            no flags held
+            their flag held
+            our flag held
+            both flags held
+    Add player stats
+        strength - chance to win wrestle = mystr / (mystr + theirstr)
+        endurence - how many turns you get to double move
+            extreamly high field influnce makes bot try double move
+        vision - how far fov radius is
+        stealth - makes you invisible on outskirts of enemy fov
+    Bots and team
+        make fov shared
+    UI
+        switch console output to be player camera
+        indicators of player and flag status
+        ask to play again at game end
