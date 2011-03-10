@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import ctf.ai.AttractiveField;
 import ctf.ai.FieldBehavior;
+import ctf.ai.PerpendicularField;
 import ctf.ai.PotentialField;
 import ctf.ai.RepulsiveField;
 import ctf.flagger.Flagger;
@@ -86,7 +87,7 @@ public class CTFMap extends World
                     addActor(new FlaggerBot(Team.B), x, y);
             }
         // addActor(new Flag(Team.B), flagpos);
-        addActor(new FlaggerBot(Team.B), flagpos);
+        // addActor(new FlaggerBot(Team.B), flagpos);
     }
 
     private void makeBehavior()
@@ -96,14 +97,27 @@ public class CTFMap extends World
         {
             PotentialField field = new RepulsiveField();
             field.attach(flagger);
-            behavior.setWeight(field, 1);
+            behavior.setWeight(field, 3);
         }
         for(Flag flag : getActors(Flag.class))
         {
             PotentialField field = new AttractiveField();
             field.attach(flag);
-            behavior.setWeight(field, 1);
+            behavior.setWeight(field, 5);
         }
+
+        PotentialField field = new PerpendicularField(false, width());
+        addActor(field, 0, 0);
+        behavior.setWeight(field, 1);
+        field = new PerpendicularField(false, width());
+        addActor(field, 0, height() - 1);
+        behavior.setWeight(field, 1);
+        field = new PerpendicularField(true, height());
+        addActor(field, 0, 0);
+        behavior.setWeight(field, 1);
+        field = new PerpendicularField(true, height());
+        addActor(field, width() - 1, 0);
+        behavior.setWeight(field, 1);
     }
 
     @Override
