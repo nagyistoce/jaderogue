@@ -1,7 +1,7 @@
-package ctf.field;
+package ctf.map;
 
-import ctf.field.CTFMap.Team;
 import ctf.flagger.Flagger;
+import ctf.map.CTFMap.Team;
 
 public class Flag extends CTFActor
 {

@@ -2,7 +2,7 @@ package ctf.flagger;
 
 import jade.util.Direction;
 import util.Vector;
-import ctf.field.CTFMap.Team;
+import ctf.map.CTFMap.Team;
 
 public class FlaggerBot extends Flagger
 {
