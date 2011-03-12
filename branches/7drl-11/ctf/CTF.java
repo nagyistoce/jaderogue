@@ -2,8 +2,8 @@ package ctf;
 
 import jade.ui.TermPanel;
 import jade.ui.Terminal;
-import ctf.field.CTFMap;
 import ctf.flagger.Player;
+import ctf.map.CTFMap;
 
 public class CTF
 {

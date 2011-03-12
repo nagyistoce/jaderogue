@@ -1,4 +1,4 @@
-package ctf.field;
+package ctf.map;
 
 import jade.core.World;
 import jade.gen.feature.Fence;

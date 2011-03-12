@@ -1,8 +1,8 @@
-package ctf.field;
+package ctf.map;
 
-import ctf.field.CTFMap.Team;
 import jade.core.Actor;
 import jade.util.ColoredChar;
+import ctf.map.CTFMap.Team;
 
 public abstract class CTFActor extends Actor
 {

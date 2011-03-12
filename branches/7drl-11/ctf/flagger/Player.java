@@ -3,7 +3,7 @@ package ctf.flagger;
 import jade.ui.Terminal;
 import jade.util.ColoredChar;
 import jade.util.Direction;
-import ctf.field.CTFMap.Team;
+import ctf.map.CTFMap.Team;
 
 public class Player extends Flagger
 {
