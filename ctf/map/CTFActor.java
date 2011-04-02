@@ -19,16 +19,9 @@ public abstract class CTFActor extends Actor
         return team;
     }
 
-    public Team otherteam()
+    public Team otherTeam()
     {
-        switch(team())
-        {
-        case A:
-            return Team.B;
-        case B:
-            return Team.A;
-        }
-        return null;
+        return team.otherTeam();
     }
 
     @Override

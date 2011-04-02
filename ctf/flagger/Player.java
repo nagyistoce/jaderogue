@@ -37,7 +37,7 @@ public class Player extends Flagger
     @Override
     public void expire()
     {
-        world().declareWinner(otherteam());
+        world().declareWinner(otherTeam());
         super.expire();
     }
 }
