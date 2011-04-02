@@ -14,7 +14,7 @@ public class FlaggerBot extends Flagger
     @Override
     public void act()
     {
-        Vector move = world().behavior().getInfluence(pos());
+        Vector move = world().behavior(this).getInfluence(pos());
         Direction dir = move.direction();
         move(dir);
     }

@@ -6,10 +6,13 @@ import jade.gen.maps.Terrain;
 import jade.ui.TermPanel;
 import jade.util.ColoredChar;
 import jade.util.Coord;
+import jade.util.Dice;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import ctf.ai.AttractiveField;
 import ctf.ai.FieldBehavior;
@@ -24,7 +27,7 @@ public class CTFMap extends World
 {
     private int divide;
     private Team winner;
-    private FieldBehavior behavior;
+    private Map<FlaggerBot, FieldBehavior> behaviors;
 
     public CTFMap(Player player)
     {
@@ -33,7 +36,7 @@ public class CTFMap extends World
         makeDivide();
         addTeamA(player);
         addTeamB();
-        makeBehavior();
+        makeBehaviors();
     }
 
     private void generate()
@@ -86,26 +89,63 @@ public class CTFMap extends World
                 if(x != flagpos.x() || y != flagpos.y())
                     addActor(new FlaggerBot(Team.B), x, y);
             }
-        // addActor(new Flag(Team.B), flagpos);
-        // addActor(new FlaggerBot(Team.B), flagpos);
+        addActor(new Flag(Team.B), flagpos);
     }
 
-    private void makeBehavior()
+    private void makeBehaviors()
     {
-        behavior = new FieldBehavior();
-        for(Flagger flagger : getActors(Flagger.class))
+        behaviors = new HashMap<FlaggerBot, FieldBehavior>();
+        for(FlaggerBot bot : getActors(FlaggerBot.class))
+            behaviors.put(bot, makeBehavior(bot.team(), Dice.global.chance()));
+    }
+
+    private FieldBehavior makeBehavior(Team team, boolean offense)
+    {
+        FieldBehavior behavior = new FieldBehavior();
+        avoidWalls(behavior);
+        if(offense)
+        {
+            getFlag(team.otherTeam(), behavior);
+            avoidTeam(team.otherTeam(), behavior);
+        }
+        else
+        {
+            getFlag(team, behavior);
+            avoidTeam(team, behavior);
+            getTeam(team.otherTeam(), behavior);
+        }
+        return behavior;
+    }
+
+    private void getFlag(Team team, FieldBehavior behavior)
+    {
+        PotentialField field = new AttractiveField();
+        field.attach(getActor(Flag.class, team));
+        behavior.setWeight(field, 10);
+    }
+
+    private void avoidTeam(Team team, FieldBehavior behavior)
+    {
+        for(Flagger flagger : getActors(Flagger.class, team))
         {
             PotentialField field = new RepulsiveField();
             field.attach(flagger);
-            behavior.setWeight(field, 3);
+            behavior.setWeight(field, 1);
         }
-        for(Flag flag : getActors(Flag.class))
+    }
+
+    private void getTeam(Team team, FieldBehavior behavior)
+    {
+        for(Flagger flagger : getActors(Flagger.class, team))
         {
             PotentialField field = new AttractiveField();
-            field.attach(flag);
-            behavior.setWeight(field, 5);
+            field.attach(flagger);
+            behavior.setWeight(field, 1);
         }
+    }
 
+    private void avoidWalls(FieldBehavior behavior)
+    {
         PotentialField field = new PerpendicularField(false, width());
         addActor(field, 0, 0);
         behavior.setWeight(field, 1);
@@ -135,30 +175,50 @@ public class CTFMap extends World
     @Override
     public void tick()
     {
-        for(Flagger flagger : getActors(Team.A))
+        for(Flagger flagger : getActors(Flagger.class, Team.A))
             flagger.act();
-        for(Flagger flagger : getActors(Team.B))
+        for(Flagger flagger : getActors(Flagger.class, Team.B))
             flagger.act();
         for(Flag flag : getActors(Flag.class))
             flag.act();
         removeExpired();
-        behavior.removeExpired();
     }
 
-    public Set<Flagger> getActors(Team team)
+    @Override
+    public void removeExpired()
     {
-        Set<Flagger> flaggers = new HashSet<Flagger>();
-        for(Flagger flagger : getActors(Flagger.class))
-            if(flagger.team() == team)
-                flaggers.add(flagger);
-        return flaggers;
+        super.removeExpired();
+        Set<FlaggerBot> expiredBots = new HashSet<FlaggerBot>();
+        for(FlaggerBot bot : behaviors.keySet())
+            if(bot.expired())
+                expiredBots.add(bot);
+        for(FlaggerBot expired : expiredBots)
+            behaviors.remove(expired);
+        for(FieldBehavior behavior : behaviors.values())
+            behavior.removeExpired();
     }
 
-    public Flagger getActorAt(Team team, int x, int y)
+    public <T extends CTFActor> Set<T> getActors(Class<T> cls, Team team)
     {
-        for(Flagger flagger : getActorsAt(Flagger.class, x, y))
-            if(flagger.team() == team)
-                return flagger;
+        Set<T> actors = new HashSet<T>();
+        for(T actor : getActors(cls))
+            if(actor.team() == team)
+                actors.add(actor);
+        return actors;
+    }
+
+    public <T extends CTFActor> T getActor(Class<T> cls, Team team)
+    {
+        for(T actor : getActors(cls, team))
+            return actor;
+        return null;
+    }
+
+    public <T extends CTFActor> T getActorAt(Class<T> c, Team t, int x, int y)
+    {
+        for(T actor : getActorsAt(c, x, y))
+            if(actor.team() == t)
+                return actor;
         return null;
     }
 
@@ -182,6 +242,19 @@ public class CTFMap extends World
         {
             return color;
         }
+
+        public Team otherTeam()
+        {
+            switch(this)
+            {
+            case A:
+                return B;
+            case B:
+                return A;
+            default:
+                return null;
+            }
+        }
     }
 
     public void declareWinner(Team team)
@@ -199,8 +272,8 @@ public class CTFMap extends World
         return winner;
     }
 
-    public FieldBehavior behavior()
+    public FieldBehavior behavior(FlaggerBot flaggerBot)
     {
-        return behavior;
+        return behaviors.get(flaggerBot);
     }
 }

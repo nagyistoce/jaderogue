@@ -20,6 +20,6 @@ public class Flag extends CTFActor
                 attach(flagger);
         }
         else if(!onside())
-            world().declareWinner(otherteam());
+            world().declareWinner(otherTeam());
     }
 }
