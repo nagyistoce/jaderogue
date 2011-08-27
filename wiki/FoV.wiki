@@ -1,5 +1,0 @@
-== FoV ==
-
-==== Raycasting ====
-
-==== Shadowcasting ==== 

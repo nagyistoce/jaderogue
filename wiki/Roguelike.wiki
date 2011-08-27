@@ -50,15 +50,9 @@ breaks the rule. That said, roguelikes tend to have these features:
   * Small Open Source Projects - while there are a few exceptions, most
     roguelikes are small open source projects with a single developer.
 
-=== Major Roguelikes ===
+=== So Why Play? ===
 
-These are summaries of some of the roguelikes that I play. This list is in no
-way comprehensive, just representative of a few I like.
-
-====== Angband ======
-
-====== Dungeon Crawl ======
-
-====== MAngband ======
-
-====== Dwarf Fortress ======
+Roguelikes are incredibly fun. They may not have the bells and wistles of a modern
+studio game with all its graphical eye candy, but the gameplay is deep, non-repetative 
+and immersive. Don't take my word for it though, go and try out a few and see what you
+think. Before you know, you too may become addicted to the roguelike genre!
