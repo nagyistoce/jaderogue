@@ -1,0 +1,1 @@
+&lt;wiki:gadget url="http://jaderogue.googlecode.com/svn/wiki/docs/wrapper.xml" height="1000" width="1000"/&gt;
